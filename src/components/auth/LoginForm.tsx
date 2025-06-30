@@ -40,14 +40,6 @@ export default function LoginForm() {
             <p className="text-gray-600">Sign in to manage Continued Education</p>
           </div>
 
-          {/* Supabase Setup Info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-semibold text-blue-800 mb-2">Supabase Authentication:</h3>
-            <p className="text-sm text-blue-700">
-              This app uses Supabase for authentication. Make sure to set up your Supabase project and add the environment variables to your .env file.
-            </p>
-          </div>
-
           {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-center">
