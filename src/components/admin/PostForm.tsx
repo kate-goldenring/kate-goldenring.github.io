@@ -15,7 +15,7 @@ export default function PostForm() {
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
-    category: 'lifestyle',
+    category: 'hiking',
     imageUrl: '',
     images: [],
     excerpt: '',
@@ -367,7 +367,6 @@ export default function PostForm() {
                   <option value="travel">Travel</option>
                   <option value="food">Food</option>
                   <option value="mountaineering">Mountaineering</option>
-                  <option value="lifestyle">Lifestyle</option>
                 </select>
               </div>
 

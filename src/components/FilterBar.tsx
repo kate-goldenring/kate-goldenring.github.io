@@ -10,8 +10,7 @@ const categories: { key: Category; label: string }[] = [
   { key: 'hiking', label: 'Hiking' },
   { key: 'travel', label: 'Travel' },
   { key: 'food', label: 'Food' },
-  { key: 'mountaineering', label: 'Mountaineering' },
-  { key: 'lifestyle', label: 'Lifestyle' }
+  { key: 'mountaineering', label: 'Mountaineering' }
 ];
 
 export default function FilterBar({ activeCategory, onCategoryChange }: FilterBarProps) {
