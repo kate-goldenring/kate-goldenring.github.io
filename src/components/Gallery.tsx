@@ -31,7 +31,7 @@ export default function Gallery() {
               <h1 className="text-4xl font-bold text-gray-900">Continued Education</h1>
             </div>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              A collection of adventures, experiences, and moments captured through photography and words
+              Field notes from nature's lecture hall
             </p>
           </div>
         </div>
