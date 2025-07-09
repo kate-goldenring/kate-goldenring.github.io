@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, ChevronLeft, ChevronRight, X, Camera } from 'lucide-react';
 import { useBlogPosts } from '../hooks/useBlogPosts';
@@ -12,12 +13,36 @@ export default function BlogPost() {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   
   const post = getBlogPost(id || '');
-  
+
   // Get metadata for the main image
   const { metadata: mainImageMetadata } = useImageMetadata(post?.imageUrl || null);
   
+  // Create a stable images array that includes the main image
+  const images = useMemo(() => {
+    if (!post) return [];
+    
+    const additionalImages = post.images || [];
+    const allImages = [...additionalImages];
+    
+    // Add main image to gallery if it exists and isn't already included
+    if (post.imageUrl && !allImages.includes(post.imageUrl)) {
+      allImages.push(post.imageUrl);
+    }
+    
+    return allImages;
+  }, [post?.imageUrl, post?.images]);
+
   // Get metadata for all gallery images
-  const { metadataMap: galleryMetadataMap } = useImageMetadataMap(post?.images || []);
+  const { metadataMap: galleryMetadataMap } = useImageMetadataMap(images);
+  
+  // Add main image metadata to the map if available
+  const finalMetadataMap = useMemo(() => {
+    const map = new Map(galleryMetadataMap);
+    if (post?.imageUrl && mainImageMetadata) {
+      map.set(post.imageUrl, mainImageMetadata);
+    }
+    return map;
+  }, [galleryMetadataMap, post?.imageUrl, mainImageMetadata]);
 
   if (!post) {
     return (
@@ -59,9 +84,9 @@ export default function BlogPost() {
   };
 
   const navigateImage = (direction: 'prev' | 'next') => {
-    if (selectedImageIndex === null || !post.images) return;
+    if (selectedImageIndex === null || !images) return;
     
-    const totalImages = post.images.length;
+    const totalImages = images.length;
     if (direction === 'prev') {
       setSelectedImageIndex(selectedImageIndex === 0 ? totalImages - 1 : selectedImageIndex - 1);
     } else {
@@ -156,12 +181,12 @@ export default function BlogPost() {
         </div>
 
         {/* Photo Gallery */}
-        {post.images && post.images.length > 0 && (
+        {images && images.length > 0 && (
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Photo Gallery</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {post.images.map((image, index) => {
-                const imageMetadata = galleryMetadataMap.get(image);
+              {images.map((image, index) => {
+                const imageMetadata = finalMetadataMap.get(image);
                 const isFlickr = isFlickrImageUrl(image);
                 
                 let photographer = 'Kate Goldenring';
@@ -213,7 +238,7 @@ export default function BlogPost() {
       </article>
 
       {/* Lightbox Modal */}
-      {selectedImageIndex !== null && post.images && (
+      {selectedImageIndex !== null && images && (
         <div
           className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
           onClick={closeLightbox}
@@ -222,8 +247,8 @@ export default function BlogPost() {
         >
           <div className="relative max-w-7xl max-h-full p-4">
             <img
-              src={post.images[selectedImageIndex]}
-              alt={galleryMetadataMap.get(post.images[selectedImageIndex])?.altText || `Gallery image ${selectedImageIndex + 1}`}
+              src={images[selectedImageIndex]}
+              alt={finalMetadataMap.get(images[selectedImageIndex])?.altText || `Gallery image ${selectedImageIndex + 1}`}
               className="max-w-full max-h-full object-contain"
               onClick={(e) => e.stopPropagation()}
             />
@@ -237,7 +262,7 @@ export default function BlogPost() {
             </button>
             
             {/* Navigation Arrows */}
-            {post.images.length > 1 && (
+            {images.length > 1 && (
               <>
                 <button
                   onClick={(e) => {
@@ -263,21 +288,21 @@ export default function BlogPost() {
             {/* Image Counter and Attribution */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
               <div className="text-white text-sm mb-2">
-                {selectedImageIndex + 1} of {post.images.length}
+                {selectedImageIndex + 1} of {images.length}
               </div>
               <div className="bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
                 <div className="flex items-center text-white text-sm">
                   <Camera className="w-4 h-4 mr-2" />
                   <span>
                     {(() => {
-                      const currentImage = post.images[selectedImageIndex];
+                      const currentImage = images[selectedImageIndex];
                       const isFlickr = isFlickrImageUrl(currentImage);
                       
                       if (isFlickr) {
                         const flickrMetadata = post.imageMetadata?.[currentImage];
-                        return flickrMetadata?.photographer || 'Flickr';
+                        return flickrMetadata?.photographer || 'Flickr User';
                       }
-                      return galleryMetadataMap.get(currentImage)?.photographer || 'Kate Goldenring';
+                      return finalMetadataMap.get(currentImage)?.photographer || 'Kate Goldenring';
                     })()}
                   </span>
                 </div>
