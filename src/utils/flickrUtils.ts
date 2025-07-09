@@ -5,6 +5,7 @@
 export interface FlickrImageData {
   photoId: string;
   userId: string;
+  photographer: string; // User-provided photographer name
   albumId?: string;
   title: string;
   imageUrl: string;
@@ -12,6 +13,7 @@ export interface FlickrImageData {
   height: number;
   alt: string;
   embedUrl: string;
+  flickrPageUrl: string;
 }
 
 /**
@@ -45,21 +47,32 @@ export function parseFlickrEmbed(embedHtml: string): FlickrImageData | null {
       return null;
     }
     
+    const userId = photoMatch[1];
+    
     return {
       photoId: photoMatch[2],
-      userId: photoMatch[1],
+      userId,
+      photographer: '', // Will be set by user input
       albumId: albumMatch ? albumMatch[1] : undefined,
       title,
       imageUrl: src,
       width,
       height,
       alt,
-      embedUrl: href
+      embedUrl: href,
+      flickrPageUrl: href
     };
   } catch (error) {
     console.error('Error parsing Flickr embed:', error);
     return null;
   }
+}
+
+/**
+ * Get Flickr user profile URL
+ */
+export function getFlickrUserUrl(data: FlickrImageData): string {
+  return `https://www.flickr.com/photos/${data.userId}/`;
 }
 
 /**

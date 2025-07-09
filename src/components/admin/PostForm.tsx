@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, X, Eye, Plus, Trash2, AlertCircle } from 'lucide-react';
+import { Save, X, Eye, Plus, Trash2, Image as ImageIcon, Upload, AlertCircle } from 'lucide-react';
 import { useBlogPosts } from '../../hooks/useBlogPosts';
 import { BlogFormData } from '../../types/BlogPost';
+import ImageUpload from './ImageUpload';
+import ImageGallery from './ImageGallery';
 import ImageSourceSelector from './ImageSourceSelector';
+import { ImageUploadResult } from '../../services/imageService';
 import { isFlickrImageUrl } from '../../utils/flickrUtils';
 
 export default function PostForm() {
@@ -14,7 +17,7 @@ export default function PostForm() {
 
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
-    category: 'hiking',
+    category: 'lifestyle',
     imageUrl: '',
     images: [],
     excerpt: '',
@@ -28,6 +31,7 @@ export default function PostForm() {
   const [selectingImageFor, setSelectingImageFor] = useState<'main' | number | null>(null);
   const [postLoaded, setPostLoaded] = useState(false);
   const [postNotFound, setPostNotFound] = useState(false);
+  const [imageMetadata, setImageMetadata] = useState<Record<string, any>>({});
 
   // Load post data for editing - only run when loading is complete
   useEffect(() => {
@@ -42,8 +46,10 @@ export default function PostForm() {
           imageUrl: post.imageUrl,
           images: post.images || [],
           excerpt: post.excerpt,
-          content: post.content
+          content: post.content,
+          imageMetadata: post.imageMetadata || {}
         });
+        setImageMetadata(post.imageMetadata || {});
         setPostLoaded(true);
         setPostNotFound(false);
       } else {
@@ -108,14 +114,22 @@ export default function PostForm() {
     if (saveError) setSaveError(null);
   };
 
-  const handleImageSelected = (imageUrl: string) => {
+  const handleImageSelected = (imageUrl: string, metadata?: any) => {
     if (selectingImageFor === 'main') {
       setFormData(prev => ({ ...prev, imageUrl: imageUrl }));
+      if (metadata) {
+        setImageMetadata(prev => ({ ...prev, [imageUrl]: metadata }));
+        setFormData(prev => ({ ...prev, imageMetadata: { ...prev.imageMetadata, [imageUrl]: metadata } }));
+      }
     } else if (typeof selectingImageFor === 'number') {
       setFormData(prev => ({
         ...prev,
         images: prev.images.map((img, i) => i === selectingImageFor ? imageUrl : img)
       }));
+      if (metadata) {
+        setImageMetadata(prev => ({ ...prev, [imageUrl]: metadata }));
+        setFormData(prev => ({ ...prev, imageMetadata: { ...prev.imageMetadata, [imageUrl]: metadata } }));
+      }
     }
     
     setSelectingImageFor(null);
@@ -339,6 +353,7 @@ export default function PostForm() {
                   <option value="travel">Travel</option>
                   <option value="food">Food</option>
                   <option value="mountaineering">Mountaineering</option>
+                  <option value="lifestyle">Lifestyle</option>
                 </select>
               </div>
 
@@ -376,7 +391,7 @@ export default function PostForm() {
                       />
                       {isFlickrImageUrl(formData.imageUrl) && (
                         <div className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-1 py-0.5 rounded">
-                          Flickr
+                          {imageMetadata[formData.imageUrl]?.photographer || 'Flickr'}
                         </div>
                       )}
                     </div>
@@ -458,7 +473,7 @@ export default function PostForm() {
                           />
                           {isFlickrImageUrl(image) && (
                             <div className="absolute top-1 right-1 bg-blue-600 text-white text-xs px-1 py-0.5 rounded">
-                              Flickr
+                              {imageMetadata[image]?.photographer || 'Flickr'}
                             </div>
                           )}
                         </div>
