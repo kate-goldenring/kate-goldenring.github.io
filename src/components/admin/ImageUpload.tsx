@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon, Loader, AlertCircle, Check } from 'lucide-react';
+import { Upload, Image as ImageIcon, Loader } from 'lucide-react';
 import { imageService, ImageUploadResult } from '../../services/imageService';
 
 interface ImageUploadProps {
