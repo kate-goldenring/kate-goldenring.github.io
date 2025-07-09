@@ -29,6 +29,15 @@ export default function Gallery() {
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
               <h1 className="text-4xl font-bold text-gray-900">Continued Education</h1>
+              <div className="ml-6 flex items-center space-x-2">
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors duration-200"
+                  title="Admin Panel"
+                >
+                  <Settings className="w-6 h-6" />
+                </button>
+              </div>
             </div>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Field notes from nature's lecture hall
