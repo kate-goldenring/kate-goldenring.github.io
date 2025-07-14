@@ -40,7 +40,7 @@ export default function Gallery() {
               </div>
             </div>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Field notes from nature's lecture hall
+              A collection of learnings through experiences.
             </p>
           </div>
         </div>
