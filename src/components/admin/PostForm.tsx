@@ -415,16 +415,16 @@ export default function PostForm() {
               <div className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-3">
                   <label className="block text-sm font-medium text-gray-700">
-                    Additional Images (up to 10 total)
+                    Additional Images (up to 20 total)
                   </label>
                   <button
                     type="button"
                     onClick={addImage}
-                    disabled={formData.images.length >= 10}
+                    disabled={formData.images.length >= 20}
                     className="inline-flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     <Plus className="w-4 h-4 mr-1" />
-                    Add Image ({formData.images.length}/10)
+                    Add Image ({formData.images.length}/20)
                   </button>
                 </div>
                 
